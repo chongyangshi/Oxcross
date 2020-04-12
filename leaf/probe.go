@@ -79,6 +79,7 @@ func initProbes(ctx context.Context) error {
 
 					// Success
 					registerProbeResult(originID, leafID, true, "")
+					registerProbeTiming(originID, leafID, duration.Seconds())
 
 					// No metrics will be available from simple origin, we only check for a 200 response.
 					if origin.Mode == types.OriginModeSimple {
@@ -122,7 +123,6 @@ func initProbes(ctx context.Context) error {
 
 					estimatedDrift := serverTime.Sub(start.Add(duration / 2))
 					registerOriginTimeDrift(originID, leafID, estimatedDrift.Seconds())
-					registerProbeTiming(originID, leafID, duration.Seconds())
 
 					return nil
 				})
