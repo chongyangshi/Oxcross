@@ -64,6 +64,7 @@ func initProbes(ctx context.Context) error {
 			// Read up-to-date config
 			cfg := readConfig()
 
+			slog.Debug(ctx, "Checking %d origin servers...", len(cfg.Origins))
 			for _, origin := range cfg.Origins {
 				origin := origin // Avoids shadowing
 				g.Go(func() error {
