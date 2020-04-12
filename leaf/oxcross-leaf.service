@@ -1,0 +1,12 @@
+[Unit]
+Description=The Oxcross leaf agent, which polls origin servers and export HTTP performance in a metrics server
+After=syslog.target
+
+[Service]
+Type=simple
+User=oxcross
+ExecStart=/usr/local/bin/oxcross-leaf
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

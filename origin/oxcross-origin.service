@@ -1,0 +1,12 @@
+[Unit]
+Description=The Oxcross origin server providing polling responses to probe clients
+After=syslog.target
+
+[Service]
+Type=simple
+User=oxcross
+ExecStart=/usr/local/bin/oxcross-origin
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
