@@ -76,7 +76,7 @@ spec:
   ports:
   - port: 8080
     protocol: TCP
-    targetPort: 8080
+    targetPort: 9300
   selector:
     app: go-oxcross-configserver
   sessionAffinity: None
