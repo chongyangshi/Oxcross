@@ -3,7 +3,6 @@ GO_VERSION := 1.14.2
 
 build:
 	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 /usr/local/go/bin/go build -ldflags="-w -s" -o ./oxcross-origin
-	rm -rf /tmp/go$(GO_VERSION).linux-amd64.tar.gz
 
 install: build
 	cp ./oxcross-origin /usr/local/bin/oxcross-origin
