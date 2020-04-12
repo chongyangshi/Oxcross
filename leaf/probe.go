@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/monzo/terrors"
@@ -34,7 +35,7 @@ func init() {
 	cache = tokenCache{}
 }
 
-func initProbes(ctx context.Context, cfg *Config) error {
+func initProbes(ctx context.Context, cfg *types.Config) error {
 	// Do not reuse connections to get accurate full handshake times
 	roundTripper := &http.Transport{
 		DisableKeepAlives:  true,
@@ -64,7 +65,7 @@ func initProbes(ctx context.Context, cfg *Config) error {
 				origin := origin // Avoids shadowing
 				g.Go(func() error {
 					start := time.Now()
-					r := typhon.NewRequest(ctx, http.MethodGet, origin.URL, nil).Send().Response()
+					r := typhon.NewRequest(ctx, http.MethodGet, origin.URL, nil).SendVia(probeClient).Response()
 					if r.Error == nil {
 						slog.Error(ctx, "Error received from %s %s:%d: %d %v", origin.Scheme, origin.Hostname, origin.Port, r.StatusCode, r.Error)
 						return r.Error
@@ -109,13 +110,16 @@ func initProbes(ctx context.Context, cfg *Config) error {
 						return err
 					}
 
-					estimatedDrift := serverTime.Sub(start.Add(duration / 2))
-					registerOriginTimeDrift(rsp.Identifier, cfg.SourceID, estimatedDrift.Seconds())
+					// Provide source hostname in exported metrics as a tag for source of probe
+					// Best effort basis, if no hostname available we export empty value
+					sourceID, _ := os.Hostname()
 
-					registerProbeTiming(rsp.Identifier, cfg.SourceID, duration.Seconds())
+					estimatedDrift := serverTime.Sub(start.Add(duration / 2))
+					registerOriginTimeDrift(rsp.Identifier, sourceID, estimatedDrift.Seconds())
+
+					registerProbeTiming(rsp.Identifier, sourceID, duration.Seconds())
 
 					return nil
-
 				})
 			}
 			if err := g.Wait(); err != nil {

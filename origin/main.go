@@ -18,7 +18,7 @@ import (
 	"github.com/icydoge/oxcross/types"
 )
 
-// Warning, this server does not currently handle timeouts!
+// Simple typhon server responding to polls from clients
 func service() typhon.Service {
 	router := typhon.Router{}
 	router.GET("/oxcross", serveResponse)

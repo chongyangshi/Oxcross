@@ -1,1 +1,27 @@
-TODO
+.PHONY: build
+SVC := oxcross-configserver
+COMMIT := $(shell git log -1 --pretty='%h')
+REPOSITORY := 172.16.16.2:2443/go
+PUBLIC_REPOSITIORY = icydoge/web
+
+.PHONY: pull build push
+
+all: pull build push clean
+publish: pull build push-public
+
+build:
+	docker build -t ${SVC} ./configserver
+
+pull:
+	docker pull golang:alpine
+
+push:
+	docker tag ${SVC}:latest ${REPOSITORY}:${SVC}-${COMMIT}
+	docker push ${REPOSITORY}:${SVC}-${COMMIT}
+
+push-public:
+	docker tag ${SVC}:latest ${PUBLIC_REPOSITIORY}:${SVC}
+	docker push ${PUBLIC_REPOSITIORY}:${SVC}
+
+clean:
+	docker image prune -f
