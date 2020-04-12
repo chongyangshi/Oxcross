@@ -74,7 +74,18 @@ func ParseConfig(ctx context.Context, configBody []byte) (*Config, error) {
 			continue
 		}
 
-		fullURL := fmt.Sprintf("%s://%s:%d/oxcross", origin.Scheme, origin.Hostname, origin.Port)
+		// Default to advanced mode if not set
+		mode := origin.Mode
+		if origin.Mode == "" {
+			mode = OriginModeAdvanced
+		}
+
+		// In advanced mode, we retrieve synchronization information from the fixed endpoint
+		fullURL := fmt.Sprintf("%s://%s:%d", origin.Scheme, origin.Hostname, origin.Port)
+		if mode == OriginModeAdvanced {
+			fullURL = fmt.Sprintf("%s/oxcross", fullURL)
+		}
+
 		if _, err := url.Parse(fullURL); err != nil {
 			slog.Warn(ctx, "Invalid URL parsed: %s, skipping", fullURL)
 			continue
@@ -82,11 +93,7 @@ func ParseConfig(ctx context.Context, configBody []byte) (*Config, error) {
 
 		o := origin
 		o.URL = fullURL
-
-		// Default to advanced mode if not set
-		if o.Mode == "" {
-			o.Mode = OriginModeAdvanced
-		}
+		o.Mode = mode
 
 		origins = append(origins, o)
 	}
