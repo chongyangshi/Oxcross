@@ -7,6 +7,7 @@ install: build
 	cp ./oxcross-leaf /usr/local/bin/oxcross-leaf
 	cp ./oxcross-leaf.service /etc/systemd/system/oxcross-leaf.service
 	chmod 644 /etc/systemd/system/oxcross-leaf.service
+	systemctl daemon-reload
 
 uninstall:
 	systemctl stop oxcross-leaf
