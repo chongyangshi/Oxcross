@@ -1,0 +1,83 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: go-oxcross-configserver
+  name: go-oxcross-configserver
+  namespace: monitoring
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 3
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: go-oxcross-configserver
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: go-oxcross-configserver
+    spec:
+      containers:
+      - env:
+        - name: OXCROSS_CONF
+          value: /etc/oxcross/oxcross_config.json
+        image: 172.16.16.2:2443/go:oxcross-configserver-d74bdd7
+        imagePullPolicy: IfNotPresent
+        name: rimegate
+        ports:
+        - containerPort: 9300
+          protocol: TCP
+        resources:
+          limits:
+            cpu: 200m
+            memory: 256Mi
+          requests:
+            cpu: 100m
+            memory: 128Mi
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 9300
+          initialDelaySeconds: 3
+          periodSeconds: 3
+        volumeMounts:
+        - mountPath: /etc/oxcross
+          name: oxcross-config
+          readOnly: true
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: oxcross-config
+        configMap:
+          defaultMode: 420
+          items:
+          - key: oxcross_config.json
+            path: oxcross_config.json
+          name: oxcross-config
+        
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: go-oxcross-configserver
+  namespace: monitoring
+spec:
+  ports:
+  - port: 8080
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app: go-oxcross-configserver
+  sessionAffinity: None
+  type: ClusterIP

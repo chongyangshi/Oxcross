@@ -1,0 +1,18 @@
+apiVersion: v1
+data:
+  oxcross_config.json: |
+    {
+        "timeout": 10,
+        "interval": 30,
+        "origins": [
+            {
+                "scheme": "http",
+                "hostname": "example.com",
+                "port": 9301
+            }
+        ]
+    }
+kind: ConfigMap
+metadata:
+  name: oxcross-config
+  namespace: monitoring
