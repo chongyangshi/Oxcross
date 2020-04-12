@@ -1,10 +1,12 @@
 package main
 
 import (
+	"net/http"
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 const (
@@ -37,4 +39,7 @@ func registerOriginTimeDrift(originID, sourceID string, timeDirft float64) {
 	originTimeDrifts.WithLabelValues(originID, sourceID).Set(timeDirft)
 }
 
-// @TODO: report results somewhere
+func initMetricsServer() {
+	http.Handle("/metrics", promhttp.Handler())
+	go http.ListenAndServe(":9299", nil)
+}

@@ -57,6 +57,9 @@ func main() {
 		panic(err)
 	}
 
+	// Initialize metrics server
+	initMetricsServer()
+
 	// Log termination gracefully
 	done := make(chan os.Signal, 1)
 	signal.Notify(done, syscall.SIGINT, syscall.SIGTERM)
