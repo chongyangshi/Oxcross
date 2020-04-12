@@ -6,11 +6,12 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/icydoge/oxcross/types"
 	"github.com/monzo/slog"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+
+	"github.com/icydoge/oxcross/types"
 )
 
 const (

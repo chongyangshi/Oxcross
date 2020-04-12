@@ -9,9 +9,8 @@ import (
 	"os"
 	"time"
 
-	"github.com/monzo/terrors"
-
 	"github.com/monzo/slog"
+	"github.com/monzo/terrors"
 	"github.com/monzo/typhon"
 	"golang.org/x/sync/errgroup"
 
