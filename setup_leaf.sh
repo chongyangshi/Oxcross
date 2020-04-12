@@ -12,8 +12,8 @@ LEAF_ID=$1
 API_BASE=$2
 
 useradd oxcross || true
-sed -i "s#API_BASE_CHANGE_ME#${API_BASE}#g" $(pwd)/leaf/oxcross-leaf.service
-sed -i "s#LEAF_ID_CHANGE_ME#${LEAF_ID}#g" $(pwd)/leaf/oxcross-leaf.service
+sed -i "s#{{LEAFID}}#${LEAF_ID}#g" $(pwd)/leaf/oxcross-leaf.service
+sed -i "s#{{APIBASE}}#${API_BASE}#g" $(pwd)/leaf/oxcross-leaf.service
 
 [ -d "/usr/local/go" ] || [ -f "/tmp/go$GO_VERSION.linux-amd64.tar.gz" ] || wget https://dl.google.com/go/go$GO_VERSION.linux-amd64.tar.gz -O /tmp/go1.14.2.linux-amd64.tar.gz
 [ -d "/usr/local/go" ] || sudo tar -C /usr/local -zxf /tmp/go$GO_VERSION.linux-amd64.tar.gz

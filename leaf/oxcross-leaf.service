@@ -5,8 +5,8 @@ After=syslog.target
 [Service]
 Type=simple
 User=oxcross
-Environment="OXCROSS_CONFIG_API_BASE=API_BASE_CHANGE_ME"
-Environment="OXCROSS_LEAF_ID=LEAF_ID_CHANGE_ME"
+Environment="OXCROSS_CONFIG_API_BASE={{APIBASE}}"
+Environment="OXCROSS_LEAF_ID={{LEAFID}}"
 ExecStart=/usr/local/bin/oxcross-leaf
 Restart=on-failure
 
