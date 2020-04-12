@@ -8,7 +8,8 @@ data:
             {
                 "scheme": "http",
                 "hostname": "example.com",
-                "port": 9301
+                "port": 9301,
+                "mode": "advanced"
             }
         ]
     }

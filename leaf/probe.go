@@ -66,10 +66,17 @@ func initProbes(ctx context.Context) error {
 			slog.Debug(ctx, "Checking %d origin servers...", len(cfg.Origins))
 			for _, origin := range cfg.Origins {
 				origin := origin // Avoids shadowing
+
+				// Provide source hostname in exported metrics as a tag for source of probe
+				// Best effort basis, if no hostname available we export empty value
+				sourceID, _ := os.Hostname()
+				originID := fmt.Sprintf("%s:%d", origin.Hostname, origin.Port)
+
 				g.Go(func() error {
 					start := time.Now()
 					r := typhon.NewRequest(ctx, http.MethodGet, origin.URL, nil).SendVia(probeClient).Response()
 					if r.Error != nil {
+						registerProbeResult(originID, sourceID, false, fmt.Sprintf("error-%d", r.StatusCode))
 						slog.Error(ctx, "Error received from %s %s:%d: %d %v", origin.Scheme, origin.Hostname, origin.Port, r.StatusCode, r.Error)
 						return r.Error
 					}
@@ -77,6 +84,13 @@ func initProbes(ctx context.Context) error {
 					duration := end.Sub(start)
 
 					// Success
+					registerProbeResult(originID, sourceID, true, "")
+
+					// No metrics will be available from simple origin, we only check for a 200 response.
+					if origin.Mode == types.OriginModeSimple {
+						return nil
+					}
+
 					rsp := &types.OriginResponse{}
 					rBytes, err := r.BodyBytes(true)
 					if err != nil {
@@ -113,13 +127,8 @@ func initProbes(ctx context.Context) error {
 						return err
 					}
 
-					// Provide source hostname in exported metrics as a tag for source of probe
-					// Best effort basis, if no hostname available we export empty value
-					sourceID, _ := os.Hostname()
-
 					estimatedDrift := serverTime.Sub(start.Add(duration / 2))
 					registerOriginTimeDrift(rsp.Identifier, sourceID, estimatedDrift.Seconds())
-
 					registerProbeTiming(rsp.Identifier, sourceID, duration.Seconds())
 
 					return nil

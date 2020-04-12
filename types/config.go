@@ -11,6 +11,17 @@ import (
 	"github.com/monzo/terrors"
 )
 
+// In simple mode, we only check that we've received a 200 response,
+// which is useful for applying to existing healthz endpoints on
+// servers without deploying an Oxcross origin server.
+// In advanced mode, we also detect whether returned content could
+// have been incorrectly cached enroute, and estimate a clock drift
+// between each leaf and each origin.
+const (
+	OriginModeSimple   = "simple"
+	OriginModeAdvanced = "advanced"
+)
+
 const (
 	defaultTimeout  = 10
 	defaultInterval = 10
@@ -26,7 +37,8 @@ type OriginEntry struct {
 	Scheme   string `json:"scheme"`
 	Hostname string `json:"hostname"`
 	Port     int    `json:"port"`
-	URL      string
+	Mode     string `json:"mode"`
+	URL      string // To be composed from schme, hostname, and port
 }
 
 func ParseConfig(ctx context.Context, configBody []byte) (*Config, error) {
@@ -70,6 +82,12 @@ func ParseConfig(ctx context.Context, configBody []byte) (*Config, error) {
 
 		o := origin
 		o.URL = fullURL
+
+		// Default to advanced mode if not set
+		if o.Mode == "" {
+			o.Mode = OriginModeAdvanced
+		}
+
 		origins = append(origins, o)
 	}
 	cfg.Origins = origins

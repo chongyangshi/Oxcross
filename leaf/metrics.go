@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/monzo/slog"
@@ -28,12 +29,14 @@ var (
 	probeTimings = promauto.NewHistogramVec(prometheus.HistogramOpts{
 		Namespace: "oxcross_leaf",
 		Name:      "probe_timings",
-		Help:      "Record the result of a successful probe to an origin",
+		Help:      "Record the timing of a successful probe to an origin",
 		Buckets:   []float64{0, 0.05, 0.1, 0.5, 1, 2},
 	}, []string{"origin_id", "source_id"})
-)
-
-var (
+	probeResults = promauto.NewCounterVec(prometheus.CounterOpts{
+		Namespace: "oxcross_leaf",
+		Name:      "probe_results",
+		Help:      "Record the result of an attempted probe to an origin",
+	}, []string{"origin_id", "source_id", "result", "reason"})
 	originTimeDrifts = promauto.NewGaugeVec(prometheus.GaugeOpts{
 		Namespace: "oxcross_leaf",
 		Name:      "origin_time_drift",
@@ -43,6 +46,10 @@ var (
 
 func registerProbeTiming(originID, sourceID string, timing float64) {
 	probeTimings.WithLabelValues(originID, sourceID).Observe(timing)
+}
+
+func registerProbeResult(originID, sourceID string, result bool, reason string) {
+	probeResults.WithLabelValues(originID, sourceID, strconv.FormatBool(result), reason).Add(1)
 }
 
 func registerOriginTimeDrift(originID, sourceID string, timeDirft float64) {

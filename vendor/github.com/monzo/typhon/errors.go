@@ -9,7 +9,7 @@ import (
 
 	"github.com/monzo/slog"
 	"github.com/monzo/terrors"
-	"github.com/monzo/terrors/proto"
+	terrorsproto "github.com/monzo/terrors/proto"
 )
 
 var (
