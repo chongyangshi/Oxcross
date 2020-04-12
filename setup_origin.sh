@@ -15,5 +15,5 @@ cd origin
 go get -d -v
 sudo make install
 systemctl enable oxcross-origin
-systemctl start oxcross-origin
+systemctl restart oxcross-origin
 systemctl status oxcross-origin
