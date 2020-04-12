@@ -10,6 +10,7 @@ export PATH=$PATH:/usr/local/go/bin
 rm -rf /tmp/go$GO_VERSION.linux-amd64.tar.gz
 
 cd leaf
+go get -d -v
 sudo make install
 systemctl enable oxcross-leaf
 systemctl start oxcross-leaf

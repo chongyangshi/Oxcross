@@ -1,7 +1,7 @@
 .PHONY: build
 
 build:
-	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 /usr/local/go/bin/go build -ldflags="-w -s" -mod vendor -o ./oxcross-leaf
+	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 /usr/local/go/bin/go build -ldflags="-w -s" -o ./oxcross-leaf
 
 install: build
 	cp ./oxcross-leaf /usr/local/bin/oxcross-leaf
