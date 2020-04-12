@@ -1,0 +1,16 @@
+global:
+  scrape_interval: 5s
+  evaluation_interval: 5s
+
+rule_files:
+  - "/etc/prometheus-rules/*.rules"
+
+scrape_configs:
+- job_name: 'oxcross-leaves'
+  static_configs:
+    - targets:
+      - 'origin-1.example.com:9299'
+      - 'origin-2.example.com:9299'
+  relabel_configs:
+    - action: drop
+      regex: '^go_.*|process_.*|promhttp_.*'
