@@ -8,6 +8,7 @@ export PATH=$PATH:/usr/local/go/bin
 rm -rf /tmp/go1.14.2.linux-amd64.tar.gz
 
 cd origin
+go get -d -v
 sudo make install
 systemctl enable oxcross-origin
 systemctl start oxcross-origin
