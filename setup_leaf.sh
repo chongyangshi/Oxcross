@@ -8,6 +8,7 @@ fi;
 set -e
 
 GO_VERSION=1.14.2
+API_BASE=$1
 
 useradd oxcross || true
 sed -i "s#API_BASE_CHANGE_ME#${API_BASE}#g" $(pwd)/leaf/oxcross-leaf.service
