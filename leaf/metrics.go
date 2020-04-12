@@ -58,6 +58,7 @@ func registerOriginTimeDrift(originID, sourceID string, timeDirft float64) {
 }
 
 func initMetricsServer() {
+	ctx := context.Background()
 	http.Handle("/metrics", promhttp.Handler())
 
 	port := types.ProbeMetricsServerPort
@@ -72,7 +73,6 @@ func initMetricsServer() {
 	}
 
 	// A simple automatic recovery routine for the metrics server with limited recent retries
-	ctx := context.Background()
 	go func() {
 		for {
 			err := http.ListenAndServe(fmt.Sprintf(":%d", port), nil)
