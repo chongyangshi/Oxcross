@@ -1,6 +1,6 @@
 #!/bin/sh
 
-if [ -Z "$1" ]; then
+if [ -z "$1" ]; then
     echo "Usage: sh setup_leaf.sh https://oxcross-configserver-api-base.example.com"
     exit 1
 fi;
