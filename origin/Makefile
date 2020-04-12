@@ -7,3 +7,11 @@ install: build
 	cp ./oxcross-origin /usr/local/bin/oxcross-origin
 	cp ./oxcross-origin.service /etc/systemd/system/oxcross-origin.service
 	chmod 644 /etc/systemd/system/oxcross-origin.service
+
+uninstall:
+	systemctl stop oxcross-origin
+	systemctl disable oxcross-origin
+	rm /etc/systemd/system/oxcross-origin.service
+	rm /usr/local/bin/oxcross-origin
+
+reinstall: uninstall install
