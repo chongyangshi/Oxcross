@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"os"
 	"strconv"
 	"time"
 
@@ -59,11 +60,22 @@ func registerOriginTimeDrift(originID, sourceID string, timeDirft float64) {
 func initMetricsServer() {
 	http.Handle("/metrics", promhttp.Handler())
 
+	port := types.ProbeMetricsServerPort
+	envPort := os.Getenv("OXCROSS_METRICS_PORT")
+	if envPort != "" {
+		portNum, err := strconv.ParseInt(envPort, 10, 64)
+		if err != nil || portNum < 1 || portNum > 32767 {
+			slog.Critical(ctx, "Invalid port: %s, cannot initialize", envPort)
+			panic(err)
+		}
+		port = int(portNum)
+	}
+
 	// A simple automatic recovery routine for the metrics server with limited recent retries
 	ctx := context.Background()
 	go func() {
 		for {
-			err := http.ListenAndServe(fmt.Sprintf(":%d", types.ProbeMetricsServerPort), nil)
+			err := http.ListenAndServe(fmt.Sprintf(":%d", port), nil)
 			if err != nil {
 				slog.Error(ctx, "Local metrics server encountered error: %v", err)
 

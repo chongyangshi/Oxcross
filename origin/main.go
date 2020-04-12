@@ -49,7 +49,7 @@ func main() {
 	ctx := context.Background()
 
 	port := types.OriginServerPort
-	envPort := os.Getenv("ORIGIN_PORT")
+	envPort := os.Getenv("OXCROSS_ORIGIN_PORT")
 	if envPort != "" {
 		portNum, err := strconv.ParseInt(envPort, 10, 64)
 		if err != nil || portNum < 1 || portNum > 32767 {
