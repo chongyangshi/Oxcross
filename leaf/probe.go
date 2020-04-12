@@ -70,7 +70,7 @@ func initProbes(ctx context.Context) error {
 				g.Go(func() error {
 					start := time.Now()
 					r := typhon.NewRequest(ctx, http.MethodGet, origin.URL, nil).SendVia(probeClient).Response()
-					if r.Error == nil {
+					if r.Error != nil {
 						slog.Error(ctx, "Error received from %s %s:%d: %d %v", origin.Scheme, origin.Hostname, origin.Port, r.StatusCode, r.Error)
 						return r.Error
 					}
