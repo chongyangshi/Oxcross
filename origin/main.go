@@ -30,14 +30,6 @@ func service() typhon.Service {
 }
 
 func serveResponse(req typhon.Request) typhon.Response {
-	origin := ""
-	if os.Getenv("ORIGIN_ID") != "" {
-		origin = os.Getenv("ORIGIN_ID")
-	} else {
-		// If we don't have an explicit origin ID set, retrieve hostname as origin ID on best effort basis.
-		origin, _ = os.Hostname()
-	}
-
 	serverTime := time.Now().Format(time.RFC3339)
 
 	entropy := make([]byte, 24)
@@ -46,7 +38,6 @@ func serveResponse(req typhon.Request) typhon.Response {
 	token := hex.EncodeToString(saltedHash[:])
 
 	rsp := types.OriginResponse{
-		Identifier: origin,
 		ServerTime: serverTime,
 		Token:      token,
 	}

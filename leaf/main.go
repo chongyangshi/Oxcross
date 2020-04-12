@@ -24,6 +24,7 @@ var (
 	cfg                  = types.Config{}
 	cfgMutex             = sync.RWMutex{}
 	configAPIBase        = ""
+	leafID               = ""
 )
 
 func setConfig(c types.Config) {
@@ -59,6 +60,13 @@ func loadConfig(ctx context.Context) ([]byte, error) {
 
 func main() {
 	ctx := context.Background()
+
+	if os.Getenv("OXCROSS_LEAF_ID") != "" {
+		leafID = os.Getenv("OXCROSS_LEAF_ID")
+	} else {
+		// If we don't have an explicit leaf ID set, retrieve hostname as leaf ID on best effort basis.
+		leafID, _ = os.Hostname()
+	}
 
 	// Retrieve config from configserver
 	if os.Getenv("OXCROSS_CONFIG_API_BASE") != "" {

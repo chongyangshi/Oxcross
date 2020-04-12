@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"net"
 	"net/http"
-	"os"
 	"time"
 
 	"github.com/monzo/slog"
@@ -25,7 +24,6 @@ var (
 type tokenCache map[string]tokenCacheEntry
 
 type tokenCacheEntry struct {
-	ID    string
 	Token string
 	Time  string
 }
@@ -66,17 +64,13 @@ func initProbes(ctx context.Context) error {
 			slog.Debug(ctx, "Checking %d origin servers...", len(cfg.Origins))
 			for _, origin := range cfg.Origins {
 				origin := origin // Avoids shadowing
-
-				// Provide source hostname in exported metrics as a tag for source of probe
-				// Best effort basis, if no hostname available we export empty value
-				sourceID, _ := os.Hostname()
-				originID := fmt.Sprintf("%s:%d", origin.Hostname, origin.Port)
+				originID := fmt.Sprintf("%s-%d-%s", origin.Hostname, origin.Port, origin.Scheme)
 
 				g.Go(func() error {
 					start := time.Now()
 					r := typhon.NewRequest(ctx, http.MethodGet, origin.URL, nil).SendVia(probeClient).Response()
 					if r.Error != nil {
-						registerProbeResult(originID, sourceID, false, fmt.Sprintf("error-%d", r.StatusCode))
+						registerProbeResult(originID, leafID, false, fmt.Sprintf("error-%d", r.StatusCode))
 						slog.Error(ctx, "Error received from %s %s:%d: %d %v", origin.Scheme, origin.Hostname, origin.Port, r.StatusCode, r.Error)
 						return r.Error
 					}
@@ -84,7 +78,7 @@ func initProbes(ctx context.Context) error {
 					duration := end.Sub(start)
 
 					// Success
-					registerProbeResult(originID, sourceID, true, "")
+					registerProbeResult(originID, leafID, true, "")
 
 					// No metrics will be available from simple origin, we only check for a 200 response.
 					if origin.Mode == types.OriginModeSimple {
@@ -109,13 +103,12 @@ func initProbes(ctx context.Context) error {
 						// If this is not the first time we process this origin, check we've not received any repeated token.
 						// If this happens, it will mean a bad cache and not a true server response, whose token should be
 						// guaranteed to be unique on each response.
-						err = terrors.BadResponse("repeated_token", fmt.Sprintf("Received repeated token from origin %s: %s at %s", rsp.Identifier, rsp.Token, rsp.ServerTime), nil)
+						err = terrors.BadResponse("repeated_token", fmt.Sprintf("Received repeated token from origin %s: %s at %s", originID, rsp.Token, rsp.ServerTime), nil)
 						slog.Error(ctx, "%+v", err)
 						return err
 					}
 
 					cache[origin.URL] = tokenCacheEntry{
-						ID:    rsp.Identifier,
 						Token: rsp.Token,
 						Time:  rsp.ServerTime,
 					}
@@ -128,8 +121,8 @@ func initProbes(ctx context.Context) error {
 					}
 
 					estimatedDrift := serverTime.Sub(start.Add(duration / 2))
-					registerOriginTimeDrift(rsp.Identifier, sourceID, estimatedDrift.Seconds())
-					registerProbeTiming(rsp.Identifier, sourceID, duration.Seconds())
+					registerOriginTimeDrift(originID, leafID, estimatedDrift.Seconds())
+					registerProbeTiming(originID, leafID, duration.Seconds())
 
 					return nil
 				})

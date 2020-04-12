@@ -1,5 +1,10 @@
 #!/bin/sh
 
+if [ -z "$1" ]; then
+    echo "Usage: sh setup_origin.sh <origin-id>"
+    exit 1
+fi;
+
 set -e
 
 GO_VERSION=1.14.2
