@@ -17,9 +17,9 @@ const (
 )
 
 type Config struct {
-	Origins  []*OriginEntry `json:"origins"`
-	Timeout  int            `json:"timeout"`
-	Interval int            `json:"interval"`
+	Origins  []OriginEntry `json:"origins"`
+	Timeout  int           `json:"timeout"`
+	Interval int           `json:"interval"`
 }
 
 type OriginEntry struct {
@@ -50,7 +50,7 @@ func ParseConfig(ctx context.Context, configBody []byte) (*Config, error) {
 		"interval": strconv.FormatInt(int64(cfg.Interval), 10),
 	}
 
-	origins := []*OriginEntry{}
+	origins := []OriginEntry{}
 	for _, origin := range cfg.Origins {
 		if origin.Scheme != "http" && origin.Scheme != "https" {
 			slog.Warn(ctx, "Oxcross found invalid scheme %s for hostname %s and port %d, skipping", origin.Scheme, origin.Hostname, origin.Port, errParams)
@@ -68,9 +68,9 @@ func ParseConfig(ctx context.Context, configBody []byte) (*Config, error) {
 			continue
 		}
 
-		o := *origin
+		o := origin
 		o.URL = fullURL
-		origins = append(origins, &o)
+		origins = append(origins, o)
 	}
 	cfg.Origins = origins
 
