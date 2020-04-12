@@ -75,7 +75,7 @@ func initProbes(ctx context.Context) error {
 						return r.Error
 					}
 					end := time.Now()
-					duration := start.Sub(end)
+					duration := end.Sub(start)
 
 					// Success
 					rsp := &types.OriginResponse{}
