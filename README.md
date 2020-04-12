@@ -17,6 +17,8 @@ Because the large variety of network environments these servers sit in, they can
 
 However, this is only a good use case if I won't need to manually reconfigure each existing monitor server every time I add an edge server to be monitored. Furthermore, having many monitor servers won't be useful unless their results can be gathered at a centralised location easily. Struggling to find an existing solution fitting these requirements, I decided to write one.
 
+![Oxcross system layout](https://images.ebornet.com/uploads/big/a47c229f94ad46e80ed627b1a5079f74.png)
+
 ## Configuration
 
 Follow the order of `oxcross-origin` on servers to be monitored, then `configserver` for distributing configuration pointing to servers to be monitored, and finally `oxcross-leaf` on servers used for monitoring.
@@ -74,6 +76,8 @@ The following metrics are available:
 * `oxcross_leaf_origin_time_drift`: a timing gauge estimating the relative system time difference between each origin and each leaf which observed it. 
 
 Once metrics are scraped, you can find an example Grafana dashboard JSON [here](https://github.com/icydoge/Oxcross/blob/master/grafana.json.example).
+
+![Oxcross dashboard](https://images.ebornet.com/uploads/big/d40c193bd3d7c34b78b78ba0a747d5c9.png)
 
 ## TODOs
 
