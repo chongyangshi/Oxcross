@@ -2,7 +2,7 @@
 
 set -e
 
-GO_VERSION = 1.14.2
+GO_VERSION=1.14.2
 
 [ -f "/tmp/go$GO_VERSION.linux-amd64.tar.gz" ] || wget https://dl.google.com/go/go$GO_VERSION.linux-amd64.tar.gz -O /tmp/go1.14.2.linux-amd64.tar.gz
 [ -d "/usr/local/go" ] || tar -C /usr/local -zxf /tmp/go$GO_VERSION.linux-amd64.tar.gz

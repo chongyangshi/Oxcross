@@ -1,5 +1,4 @@
 .PHONY: build
-GO_VERSION := 1.14.2
 
 build:
 	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 /usr/local/go/bin/go build -ldflags="-w -s" -o ./oxcross-origin
