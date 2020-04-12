@@ -57,7 +57,7 @@ func serveResponse(req typhon.Request) typhon.Response {
 func main() {
 	ctx := context.Background()
 
-	port := 9301
+	port := types.OriginServerPort
 	envPort := os.Getenv("ORIGIN_PORT")
 	if envPort != "" {
 		portNum, err := strconv.ParseInt(envPort, 10, 64)

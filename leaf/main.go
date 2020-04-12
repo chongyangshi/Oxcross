@@ -6,25 +6,59 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"sync"
 	"syscall"
-
-	"github.com/monzo/typhon"
+	"time"
 
 	"github.com/monzo/slog"
 	"github.com/monzo/terrors"
+	"github.com/monzo/typhon"
 
 	"github.com/icydoge/oxcross/types"
 )
 
 var (
-	defaultTimeout  = 5
-	defaultInterval = 10
-	cfg             = types.Config{}
+	defaultTimeout       = 5
+	defaultInterval      = 10
+	configReloadInterval = 60
+	cfg                  = types.Config{}
+	cfgMutex             = sync.RWMutex{}
+	configAPIBase        = ""
 )
+
+func setConfig(c types.Config) {
+	cfgMutex.Lock()
+	defer cfgMutex.Unlock()
+
+	cfg = c
+}
+
+func readConfig() types.Config {
+	cfgMutex.RLock()
+	defer cfgMutex.RUnlock()
+
+	return cfg
+}
+
+func loadConfig(ctx context.Context) ([]byte, error) {
+	configReq := typhon.NewRequest(ctx, http.MethodGet, fmt.Sprintf("%s/config", configAPIBase), nil)
+	configRsp := configReq.Send().Response()
+	if configRsp.Error != nil {
+		slog.Error(ctx, "Oxcross cannot load config, configserver returned %+v", configRsp.Error)
+		return nil, configRsp.Error
+	}
+
+	configBody, err := configRsp.BodyBytes(true)
+	if err != nil {
+		slog.Error(ctx, "Oxcross error reading config response, cannot start: %v", err)
+		return nil, err
+	}
+
+	return configBody, nil
+}
 
 func main() {
 	ctx := context.Background()
-	configAPIBase := ""
 
 	// Retrieve config from configserver
 	if os.Getenv("OXCROSS_CONFIG_API_BASE") != "" {
@@ -36,29 +70,47 @@ func main() {
 		panic(err)
 	}
 
-	configReq := typhon.NewRequest(ctx, http.MethodGet, fmt.Sprintf("%s/config", configAPIBase), nil)
-	configRsp := configReq.Send().Response()
-	if configRsp.Error != nil {
-		slog.Critical(ctx, "Oxcross cannot load config, configserver returned %+v", configRsp.Error)
-		panic(configRsp.Error)
-	}
-
-	configBody, err := configRsp.BodyBytes(true)
+	configBody, err := loadConfig(ctx)
 	if err != nil {
-		slog.Critical(ctx, "Oxcross error reading config response, cannot start: %v", err)
+		slog.Critical(ctx, "Oxcross cannot start as config load failed: %v", err)
 		panic(err)
 	}
 
-	types.MustLoadConfig(ctx, configBody)
+	c, err := types.ParseConfig(ctx, configBody)
+	if err != nil {
+		slog.Critical(ctx, "Oxcross cannot start as config parse failed: %v", err)
+		panic(err)
+	}
+
+	setConfig(*c)
 
 	// Initialize client
-	if err = initProbes(ctx, &cfg); err != nil {
+	if err = initProbes(ctx); err != nil {
 		slog.Critical(ctx, "Oxcross error initializing client: %v, cannot continue", err)
 		panic(err)
 	}
 
 	// Initialize metrics server
 	initMetricsServer()
+
+	// Automatically reload config
+	configTicker := time.NewTicker(time.Duration(configReloadInterval) * time.Second)
+	go func() {
+		for range configTicker.C {
+			b, err := loadConfig(ctx)
+			if err != nil {
+				slog.Error(ctx, "Failed loading up-to-date config: %v, retaining existing config", err)
+			}
+
+			c, err := types.ParseConfig(ctx, b)
+			if err != nil {
+				slog.Error(ctx, "Failed parsing up-to-date config: %v, retaining existing config", err)
+			}
+
+			setConfig(*c)
+			slog.Debug(ctx, "Reloaded config at %s", time.Now().Format(time.RFC3339), nil)
+		}
+	}()
 
 	// Log termination gracefully
 	done := make(chan os.Signal, 1)

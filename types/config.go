@@ -29,13 +29,12 @@ type OriginEntry struct {
 	URL      string
 }
 
-// MustLoadConfig panics if no valid config can be loaded from the input payload.
-func MustLoadConfig(ctx context.Context, configBody []byte) Config {
+func ParseConfig(ctx context.Context, configBody []byte) (*Config, error) {
 	cfg := Config{}
 	err := json.Unmarshal(configBody, &cfg)
 	if err != nil {
-		slog.Critical(ctx, "Oxcross error parsing config %v, cannot start: %v", configBody, err)
-		panic(err)
+		slog.Error(ctx, "Oxcross error parsing config %v: %v", configBody, err)
+		return nil, err
 	}
 
 	switch {
@@ -79,9 +78,9 @@ func MustLoadConfig(ctx context.Context, configBody []byte) Config {
 
 	if len(cfg.Origins) == 0 {
 		err = terrors.InternalService("empty_config", fmt.Sprintf("Oxcross read empty config %v (or entirely invalid), cannot start", cfg), nil)
-		slog.Critical(ctx, "%v", err)
-		panic(err)
+		slog.Error(ctx, "%v", err)
+		return nil, err
 	}
 
-	return cfg
+	return &cfg, nil
 }

@@ -10,7 +10,7 @@ all: pull build push clean
 publish: pull build push-public
 
 build:
-	docker build -t ${SVC} ./configserver
+	docker build -t ${SVC} .
 
 pull:
 	docker pull golang:alpine

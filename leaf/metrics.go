@@ -1,9 +1,11 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 	"time"
 
+	"github.com/icydoge/oxcross/types"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -41,5 +43,5 @@ func registerOriginTimeDrift(originID, sourceID string, timeDirft float64) {
 
 func initMetricsServer() {
 	http.Handle("/metrics", promhttp.Handler())
-	go http.ListenAndServe(":9299", nil)
+	go http.ListenAndServe(fmt.Sprintf(":%d", types.ProbeMetricsServerPort), nil)
 }

@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"os/signal"
@@ -14,7 +15,7 @@ import (
 	"github.com/icydoge/oxcross/types"
 )
 
-var cfg = types.Config{}
+var cfg = &types.Config{}
 
 // This server runs in Kubernetes and is responsible for distributing origin configurations to leaves.
 func service() typhon.Service {
@@ -47,11 +48,15 @@ func main() {
 		panic(err)
 	}
 
-	types.MustLoadConfig(ctx, originConfig)
+	cfg, err = types.ParseConfig(ctx, originConfig)
+	if err != nil {
+		slog.Critical(ctx, "Error parsing config %s, cannot start: %v", configPath, err)
+		panic(err)
+	}
 
 	// Initialise server for incoming requests
 	svc := service()
-	srv, err := typhon.Listen(svc, ":9300")
+	srv, err := typhon.Listen(svc, fmt.Sprintf(":%d", types.ConfigServerPort))
 	if err != nil {
 		slog.Critical(ctx, "Error initializing listener: %v", err)
 		panic(err)

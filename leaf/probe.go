@@ -35,7 +35,7 @@ func init() {
 	cache = tokenCache{}
 }
 
-func initProbes(ctx context.Context, cfg *types.Config) error {
+func initProbes(ctx context.Context) error {
 	// Do not reuse connections to get accurate full handshake times
 	roundTripper := &http.Transport{
 		DisableKeepAlives:  true,
@@ -60,6 +60,9 @@ func initProbes(ctx context.Context, cfg *types.Config) error {
 	go func() {
 		for range outgoingTicker.C {
 			g, ctx := errgroup.WithContext(ctx)
+
+			// Read up-to-date config
+			cfg := readConfig()
 
 			for _, origin := range cfg.Origins {
 				origin := origin // Avoids shadowing
