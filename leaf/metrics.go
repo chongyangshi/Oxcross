@@ -62,7 +62,7 @@ func registerProbeResult(originID, sourceID string, result bool, reason string) 
 	if !result {
 		gaugeValue = 0.0
 	}
-	originStatus.WithLabelValues(originID, sourceID).Set(gaugeValue)
+	originStatus.WithLabelValues(originID, sourceID, strconv.FormatBool(result), reason).Set(gaugeValue)
 }
 
 func registerOriginTimeDrift(originID, sourceID string, timeDirft float64) {
