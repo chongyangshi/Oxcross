@@ -108,11 +108,13 @@ func main() {
 			b, err := loadConfig(ctx)
 			if err != nil {
 				slog.Error(ctx, "Failed loading up-to-date config: %v, retaining existing config", err)
+				continue
 			}
 
 			c, err := types.ParseConfig(ctx, b)
 			if err != nil {
 				slog.Error(ctx, "Failed parsing up-to-date config: %v, retaining existing config", err)
+				continue
 			}
 
 			setConfig(*c)
