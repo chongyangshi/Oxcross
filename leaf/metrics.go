@@ -43,6 +43,11 @@ var (
 		Name:      "origin_time_drift",
 		Help:      "Record the perceived timedrift of the origin server",
 	}, []string{"origin_id", "source_id"})
+	originStatus = promauto.NewGaugeVec(prometheus.GaugeOpts{
+		Namespace: "oxcross_leaf",
+		Name:      "origin_status",
+		Help:      "Record the current status of an origin from the perspective of the probe",
+	}, []string{"origin_id", "source_id", "result", "reason"})
 )
 
 func registerProbeTiming(originID, sourceID string, timing float64) {
@@ -51,6 +56,13 @@ func registerProbeTiming(originID, sourceID string, timing float64) {
 
 func registerProbeResult(originID, sourceID string, result bool, reason string) {
 	probeResults.WithLabelValues(originID, sourceID, strconv.FormatBool(result), reason).Add(1)
+
+	// Also update origin status as a real time value
+	gaugeValue := 1.0
+	if !success {
+		gaugeValue = 0.0
+	}
+	originStatus.WithLabelValues(originID, sourceID).Set(gaugeValue)
 }
 
 func registerOriginTimeDrift(originID, sourceID string, timeDirft float64) {
