@@ -59,7 +59,7 @@ func registerProbeResult(originID, sourceID string, result bool, reason string) 
 
 	// Also update origin status as a real time value
 	gaugeValue := 1.0
-	if !success {
+	if !result {
 		gaugeValue = 0.0
 	}
 	originStatus.WithLabelValues(originID, sourceID).Set(gaugeValue)
