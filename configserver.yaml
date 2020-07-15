@@ -27,7 +27,7 @@ spec:
       - env:
         - name: OXCROSS_CONF
           value: /etc/oxcross/oxcross_config.json
-        image: icydoge/web:oxcross-configserver-ebb2d1f
+        image: icydoge/web:oxcross-configserver-06a00bf
         imagePullPolicy: IfNotPresent
         name: rimegate
         ports:
