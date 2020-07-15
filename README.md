@@ -30,21 +30,21 @@ This component is optional if you already have a health check endpoint which ret
 To set it up on a node to be monitored:
 ```
 apt install sudo git
-git clone https://github.com/icydoge/Oxcross.git
+git clone https://github.com/chongyangshi/Oxcross.git
 cd Oxcross
 sh setup_origin.sh
 ```
 
 ### `configserver`
 
-Follow the example of [`config.yaml.example`](https://github.com/icydoge/Oxcross/blob/master/config.yaml.example), add all origin server locations into a `JSON` config file.
+Follow the example of [`config.yaml.example`](https://github.com/chongyangshi/Oxcross/blob/master/config.yaml.example), add all origin server locations into a `JSON` config file.
 * In `simple` mode, Oxcross will send a GET request to `scheme://host:port/`, and monitor a 200 response.
 * In `advanced` mode (`oxcross-origin` required), Oxcross will send a GET request to `scheme://host:port/oxcross` which exports timing informatin in a 200 response.
 
 `configserver` is optimized for running in a Kubernetes cluster. If using Kubernetes:
-* Wrap the JSON in a `ConfigMap` manifest as shown in [`config.yaml.example`](https://github.com/icydoge/Oxcross/blob/master/config.yaml.example)
+* Wrap the JSON in a `ConfigMap` manifest as shown in [`config.yaml.example`](https://github.com/chongyangshi/Oxcross/blob/master/config.yaml.example)
 * Apply the `ConfigMap` manifest to create in-cluster configuration
-* Apply [`configserver.yaml`](https://github.com/icydoge/Oxcross/blob/master/configserver.yaml) to set up the `configserver`.
+* Apply [`configserver.yaml`](https://github.com/chongyangshi/Oxcross/blob/master/configserver.yaml) to set up the `configserver`.
 * The `Service` created (`go-oxcross-configserver.monitoring.svc.cluster.local`) will need to be fronted by some kind of load balancer or reverse proxy to be exposed to the internet.
 
 If not running in a cluster:
@@ -59,7 +59,7 @@ The binary will listen on `:9300` in either case.
 This component does the actual monitoring. To set it up on a node and monitor origin nodes:
 ```
 apt install sudo git
-git clone https://github.com/icydoge/Oxcross.git
+git clone https://github.com/chongyangshi/Oxcross.git
 cd Oxcross
 sh setup_leaf.sh <leaf-id> https://your-oxcross-configserver.example.com
 ```
@@ -68,14 +68,14 @@ You will need to give each leaf a unique `<leaf-id>` to identify it in metrics, 
 
 ## Metrics
 
-`oxcross-leaf` instances export Prometheus metrics on `:9299`, which can be scraped through the internet or internal network by your Prometheus instance. An example Prometheus job can be found [here](https://github.com/icydoge/Oxcross/blob/master/prometheus.yaml.example).
+`oxcross-leaf` instances export Prometheus metrics on `:9299`, which can be scraped through the internet or internal network by your Prometheus instance. An example Prometheus job can be found [here](https://github.com/chongyangshi/Oxcross/blob/master/prometheus.yaml.example).
 
 The following metrics are available:
 * `oxcross_leaf_probe_timings_{count|sum|bucket}`: a histogram counter providing HTTP round trip latency information from each leaf to each origin
 * `oxcross_leaf_probe_results`: a success/fail counter allowing monitoring of reachability from each leaf to each origin
 * `oxcross_leaf_origin_time_drift`: a timing gauge estimating the relative system time difference between each origin and each leaf which observed it. 
 
-Once metrics are scraped, you can find an example Grafana dashboard JSON [here](https://github.com/icydoge/Oxcross/blob/master/grafana.json.example).
+Once metrics are scraped, you can find an example Grafana dashboard JSON [here](https://github.com/chongyangshi/Oxcross/blob/master/grafana.json.example).
 
 ![Oxcross dashboard](https://images.ebornet.com/uploads/big/d40c193bd3d7c34b78b78ba0a747d5c9.png)
 

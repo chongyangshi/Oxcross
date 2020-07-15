@@ -12,7 +12,7 @@ import (
 	"github.com/monzo/slog"
 	"github.com/monzo/typhon"
 
-	"github.com/icydoge/oxcross/types"
+	"github.com/chongyangshi/oxcross/types"
 )
 
 var cfg = &types.Config{}

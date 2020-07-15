@@ -15,7 +15,7 @@ import (
 	"github.com/monzo/slog"
 	"github.com/monzo/typhon"
 
-	"github.com/icydoge/oxcross/types"
+	"github.com/chongyangshi/oxcross/types"
 )
 
 // Simple typhon server responding to polls from clients

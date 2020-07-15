@@ -13,7 +13,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 
-	"github.com/icydoge/oxcross/types"
+	"github.com/chongyangshi/oxcross/types"
 )
 
 const (

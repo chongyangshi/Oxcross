@@ -13,7 +13,7 @@ import (
 	"github.com/monzo/typhon"
 	"golang.org/x/sync/errgroup"
 
-	"github.com/icydoge/oxcross/types"
+	"github.com/chongyangshi/oxcross/types"
 )
 
 var (

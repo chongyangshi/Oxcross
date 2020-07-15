@@ -14,7 +14,7 @@ import (
 	"github.com/monzo/terrors"
 	"github.com/monzo/typhon"
 
-	"github.com/icydoge/oxcross/types"
+	"github.com/chongyangshi/oxcross/types"
 )
 
 var (
