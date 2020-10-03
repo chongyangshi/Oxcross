@@ -17,7 +17,7 @@ Because the large variety of network environments these servers sit in, they can
 
 However, this is only a good use case if I won't need to manually reconfigure each existing monitor server every time I add an edge server to be monitored. Furthermore, having many monitor servers won't be useful unless their results can be gathered at a centralised location easily. Struggling to find an existing solution fitting these requirements, I decided to write one.
 
-![Oxcross system layout](https://images.ebornet.com/uploads/big/a47c229f94ad46e80ed627b1a5079f74.png)
+![Oxcross system layout](https://i.doge.at/uploads/big/a47c229f94ad46e80ed627b1a5079f74.png)
 
 ## Configuration
 
